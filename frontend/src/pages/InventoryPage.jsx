@@ -1,13 +1,14 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useOutletContext, useSearchParams } from 'react-router-dom'
 import { productsAPI } from '../services/api'
-import { Plus, Filter, Download } from 'lucide-react'
+import { Plus, Download } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
 import ProductTable from '../components/inventory/ProductTable'
 import AddProductModal from '../components/inventory/AddProductModal'
 import EditProductModal from '../components/inventory/EditProductModal'
 import QuickUpdateModal from '../components/inventory/QuickUpdateModal'
+import CustomSelect from '../components/ui/CustomSelect'
 
 const CATEGORIES = ['Electronics', 'Furniture', 'Stationery', 'Tools', 'Clothing', 'Food & Beverage', 'Other']
 
@@ -75,21 +76,17 @@ export default function InventoryPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-wrap">
           {/* Category filter */}
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-            <select
-              id="category-filter"
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-8 py-2 text-sm text-white/80
-                         focus:outline-none focus:border-primary-500 appearance-none cursor-pointer"
-            >
-              <option value="">All Categories</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            id="category-filter"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            placeholder="All Categories"
+            options={[
+              { value: '', label: 'All Categories' },
+              ...CATEGORIES.map((c) => ({ value: c, label: c })),
+            ]}
+            className="w-44"
+          />
 
           {/* Low stock toggle */}
           <label className="flex items-center gap-2 cursor-pointer select-none">

@@ -1,4 +1,4 @@
-import { Package, AlertTriangle, DollarSign, TrendingUp, ShoppingCart } from 'lucide-react'
+import { Package, AlertTriangle, DollarSign, TrendingUp, Users, ShoppingCart } from 'lucide-react'
 
 function MetricCard({ id, title, value, subtitle, icon: Icon, iconColor, glowClass, loading }) {
   return (
@@ -36,7 +36,7 @@ export default function MetricsBar({ metrics, loading, isAdmin }) {
     : '—'
 
   return (
-    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
       <MetricCard
         id="metric-total-products"
         title="Total Products"
@@ -65,6 +65,26 @@ export default function MetricsBar({ metrics, loading, isAdmin }) {
         icon={DollarSign}
         iconColor="text-emerald-400"
         glowClass="bg-emerald-500"
+        loading={loading}
+      />
+      <MetricCard
+        id="metric-total-customers"
+        title="Total Customers"
+        value={loading ? '…' : metrics?.total_customers?.toLocaleString() ?? '0'}
+        subtitle="Registered customers"
+        icon={Users}
+        iconColor="text-accent-cyan"
+        glowClass="bg-accent-cyan"
+        loading={loading}
+      />
+      <MetricCard
+        id="metric-total-orders"
+        title="Total Orders"
+        value={loading ? '…' : metrics?.total_orders?.toLocaleString() ?? '0'}
+        subtitle="All time orders"
+        icon={ShoppingCart}
+        iconColor="text-accent-violet"
+        glowClass="bg-accent-violet"
         loading={loading}
       />
       <MetricCard

@@ -6,6 +6,8 @@ import DashboardPage from './pages/DashboardPage'
 import InventoryPage from './pages/InventoryPage'
 import SuppliersPage from './pages/SuppliersPage'
 import TransactionsPage from './pages/TransactionsPage'
+import CustomersPage from './pages/CustomersPage'
+import OrdersPage from './pages/OrdersPage'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth()
@@ -39,6 +41,8 @@ export default function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard"    element={<DashboardPage />} />
         <Route path="inventory"    element={<InventoryPage />} />
+        <Route path="customers"    element={<CustomersPage />} />
+        <Route path="orders"       element={<OrdersPage />} />
         <Route path="suppliers"    element={<SuppliersPage />} />
         <Route path="transactions" element={<TransactionsPage />} />
       </Route>

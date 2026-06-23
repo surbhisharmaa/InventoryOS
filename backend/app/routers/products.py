@@ -1,4 +1,5 @@
 from typing import Annotated, Optional
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
@@ -24,7 +25,7 @@ async def list_products(
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    page_size: int = Query(20, ge=1, le=500, description="Items per page"),
     search: Optional[str] = Query(None, description="Search by name or SKU"),
     category: Optional[str] = Query(None, description="Filter by category"),
     low_stock_only: bool = Query(False, description="Return only low-stock items"),
@@ -71,7 +72,7 @@ async def list_products(
 
 @router.get("/{product_id}", response_model=ProductResponse)
 async def get_product(
-    product_id: str,
+    product_id: uuid.UUID,
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -117,7 +118,7 @@ async def create_product(
 
 @router.put("/{product_id}", response_model=ProductResponse)
 async def update_product(
-    product_id: str,
+    product_id: uuid.UUID,
     payload: ProductUpdate,
     current_user: AdminUser,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -145,7 +146,7 @@ async def update_product(
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
-    product_id: str,
+    product_id: uuid.UUID,
     current_user: AdminUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -178,7 +179,7 @@ async def list_suppliers(
 
 @suppliers_router.get("/{supplier_id}", response_model=SupplierResponse)
 async def get_supplier(
-    supplier_id: str,
+    supplier_id: uuid.UUID,
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -204,7 +205,7 @@ async def create_supplier(
 
 @suppliers_router.put("/{supplier_id}", response_model=SupplierResponse)
 async def update_supplier(
-    supplier_id: str,
+    supplier_id: uuid.UUID,
     payload: SupplierUpdate,
     current_user: AdminUser,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -224,7 +225,7 @@ async def update_supplier(
 
 @suppliers_router.delete("/{supplier_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_supplier(
-    supplier_id: str,
+    supplier_id: uuid.UUID,
     current_user: AdminUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.redis_client import get_redis, close_redis
-from app.routers import auth_router, products_router, suppliers_router, stock_router, analytics_router
+from app.routers import auth_router, products_router, suppliers_router, stock_router, analytics_router, customers_router, orders_router
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -76,6 +76,8 @@ app.include_router(products_router,  prefix=PREFIX)
 app.include_router(suppliers_router, prefix=PREFIX)
 app.include_router(stock_router,     prefix=PREFIX)
 app.include_router(analytics_router, prefix=PREFIX)
+app.include_router(customers_router, prefix=PREFIX)
+app.include_router(orders_router,    prefix=PREFIX)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { X, Loader2 } from 'lucide-react'
 import { productsAPI, suppliersAPI } from '../../services/api'
 import toast from 'react-hot-toast'
+import CustomSelect from '../ui/CustomSelect'
 
 const CATEGORIES = ['Electronics', 'Furniture', 'Stationery', 'Tools', 'Clothing', 'Food & Beverage', 'Other']
 
@@ -10,7 +11,7 @@ export default function AddProductModal({ onClose, onSuccess }) {
   const [suppliers, setSuppliers] = useState([])
   const [submitting, setSubmitting] = useState(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: { quantity: 0, reorder_point: 10, cost_price: 0, selling_price: 0 },
   })
 
@@ -62,11 +63,15 @@ export default function AddProductModal({ onClose, onSuccess }) {
             </div>
             <div>
               <label className="label">Category *</label>
-              <select {...register('category', { required: 'Category is required' })}
-                className={`input-field ${errors.category ? 'border-rose-500/60' : ''}`}>
-                <option value="">Select…</option>
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <input type="hidden" {...register('category', { required: 'Category is required' })} />
+              <CustomSelect
+                id="product-category"
+                value={watch('category') || ''}
+                onChange={(e) => setValue('category', e.target.value, { shouldValidate: true })}
+                placeholder="Select category…"
+                options={CATEGORIES.map((c) => ({ value: c, label: c }))}
+                className={errors.category ? 'ring-1 ring-rose-500/60 rounded-xl' : ''}
+              />
               {errors.category && <p className="mt-1 text-xs text-rose-400">{errors.category.message}</p>}
             </div>
           </div>
@@ -124,12 +129,16 @@ export default function AddProductModal({ onClose, onSuccess }) {
 
           <div>
             <label className="label">Supplier</label>
-            <select {...register('supplier_id')} className="input-field">
-              <option value="">No supplier</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
+            <CustomSelect
+              id="product-supplier"
+              value={watch('supplier_id') || ''}
+              onChange={(e) => setValue('supplier_id', e.target.value)}
+              placeholder="No supplier"
+              options={[
+                { value: '', label: 'No supplier' },
+                ...suppliers.map((s) => ({ value: s.id, label: s.name })),
+              ]}
+            />
           </div>
 
           <div className="flex gap-3 pt-2">

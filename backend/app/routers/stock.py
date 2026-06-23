@@ -2,10 +2,11 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from app.core.database import get_db
 from app.models.product import Product
 from app.models.stock_transaction import StockTransaction, TransactionType
-from app.models.purchase_order import PurchaseOrder
+from app.models.purchase_order import PurchaseOrder, OrderStatus
 from app.schemas.stock import (
     StockAdjustRequest, StockTransactionResponse,
     StockTransactionListResponse, PurchaseOrderResponse, LowStockItem,
@@ -90,7 +91,7 @@ async def list_transactions(
     page_size: int = Query(20, ge=1, le=100),
 ):
     """List stock transaction history with optional product filtering."""
-    base_q = select(StockTransaction)
+    base_q = select(StockTransaction).options(selectinload(StockTransaction.product))
 
     if product_id:
         base_q = base_q.where(StockTransaction.product_id == product_id)
@@ -104,8 +105,26 @@ async def list_transactions(
     )
     items = result.scalars().all()
 
+    # Build response with product details
+    item_responses = [
+        StockTransactionResponse(
+            id=tx.id,
+            product_id=tx.product_id,
+            product_name=tx.product.name if tx.product else None,
+            product_sku=tx.product.sku if tx.product else None,
+            user_id=tx.user_id,
+            transaction_type=tx.transaction_type,
+            quantity_changed=tx.quantity_changed,
+            quantity_before=tx.quantity_before,
+            quantity_after=tx.quantity_after,
+            notes=tx.notes,
+            created_at=tx.created_at,
+        )
+        for tx in items
+    ]
+
     return StockTransactionListResponse(
-        items=items,
+        items=item_responses,
         total=total,
         page=page,
         page_size=page_size,
@@ -148,10 +167,10 @@ async def trigger_low_stock_check(
         existing_po = await db.execute(
             select(PurchaseOrder).where(
                 PurchaseOrder.product_id == product.id,
-                PurchaseOrder.status == "PENDING",
-            )
+                PurchaseOrder.status == OrderStatus.PENDING,
+            ).limit(1)
         )
-        if existing_po.scalar_one_or_none():
+        if existing_po.scalars().first():
             continue
 
         reorder_qty = max(product.reorder_point * 2, 10)

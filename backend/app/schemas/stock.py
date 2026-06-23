@@ -23,6 +23,8 @@ class StockAdjustRequest(BaseModel):
 class StockTransactionResponse(BaseModel):
     id: uuid.UUID
     product_id: uuid.UUID
+    product_name: Optional[str] = None
+    product_sku: Optional[str] = None
     user_id: uuid.UUID
     transaction_type: TransactionType
     quantity_changed: int

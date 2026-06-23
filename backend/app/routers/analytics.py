@@ -6,6 +6,8 @@ from decimal import Decimal
 from app.core.database import get_db
 from app.models.product import Product
 from app.models.stock_transaction import StockTransaction, TransactionType
+from app.models.customer import Customer
+from app.models.order import Order
 from app.middleware.auth import CurrentUser, AdminUser
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
@@ -52,11 +54,21 @@ async def get_dashboard_metrics(
     )
     total_inventory_value = float(value_result.scalar_one() or 0)
 
+    # Total customers
+    cust_result = await db.execute(select(func.count()).select_from(Customer))
+    total_customers = cust_result.scalar_one()
+
+    # Total orders
+    orders_result = await db.execute(select(func.count()).select_from(Order))
+    total_orders = orders_result.scalar_one()
+
     base_data = {
         "total_products": total_products,
         "low_stock_count": low_stock_count,
         "out_of_stock_count": out_of_stock_count,
         "total_inventory_value": round(total_inventory_value, 2),
+        "total_customers": total_customers,
+        "total_orders": total_orders,
         "monthly_revenue": None,
     }
 

@@ -2,13 +2,15 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, Package, Truck, ArrowLeftRight,
-  ChevronLeft, ChevronRight, Boxes,
+  ChevronLeft, ChevronRight, Boxes, Users, ShoppingCart,
 } from 'lucide-react'
 import clsx from 'clsx'
 
 const NAV_ITEMS = [
   { to: '/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
   { to: '/inventory',    label: 'Inventory',    icon: Package },
+  { to: '/customers',    label: 'Customers',    icon: Users },
+  { to: '/orders',       label: 'Orders',       icon: ShoppingCart },
   { to: '/suppliers',    label: 'Suppliers',    icon: Truck },
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
 ]

@@ -73,6 +73,7 @@ body {
     @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white
            placeholder-white/30 focus:outline-none focus:border-primary-500 focus:bg-white/10
            transition-all duration-200;
+    color-scheme: dark;
   }
 
   .label {
@@ -143,4 +144,41 @@ body {
   background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
+}
+
+/* ── Select / Dropdown Styling ───────────────────────────────────────────────── */
+/* Make <select> styled correctly in dark theme — options use system UI so we
+   must set background and color on both the select and its options explicitly. */
+select.input-field,
+select[class*="input-field"],
+.input-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+select.input-field option,
+select[class*="input-field"] option {
+  background-color: #1a1a2e;
+  color: #e2e8f0;
+  padding: 8px 12px;
+}
+
+select.input-field option:hover,
+select[class*="input-field"] option:hover,
+select.input-field option:focus,
+select[class*="input-field"] option:focus,
+select.input-field option:checked,
+select[class*="input-field"] option:checked {
+  background-color: #4338ca;
+  color: #ffffff;
+}
+
+/* Also target standalone selects without the explicit class */
+select {
+  color-scheme: dark;
 }

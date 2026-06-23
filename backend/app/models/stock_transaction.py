@@ -2,7 +2,7 @@ import uuid
 import enum
 from datetime import datetime, timezone
 from sqlalchemy import Integer, Text, ForeignKey, DateTime, Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
 
@@ -35,3 +35,6 @@ class StockTransaction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), index=True
     )
+
+    # Relationships
+    product: Mapped["Product"] = relationship("Product", lazy="select")  # noqa: F821

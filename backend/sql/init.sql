@@ -13,6 +13,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TYPE user_role AS ENUM ('admin', 'staff');
 CREATE TYPE transaction_type AS ENUM ('IN', 'OUT', 'ADJUSTMENT');
 CREATE TYPE order_status AS ENUM ('PENDING', 'SENT', 'ACKNOWLEDGED', 'RECEIVED', 'CANCELLED');
+CREATE TYPE customer_order_status AS ENUM ('PENDING', 'CONFIRMED', 'CANCELLED');
 
 -- ===========================================================================
 -- USERS TABLE
@@ -179,3 +180,75 @@ INSERT INTO products (sku, name, description, category, quantity, reorder_point,
     ('DESK-001',    'Standing Desk 140cm',       'Electric height-adjustable',       'Furniture',     6,  3,  290.00, 599.99, 'b2c3d4e5-f6a7-8901-bcde-f12345678901'),
     ('HARD-001',    '4TB External HDD',          'USB-C, ruggedized casing',        'Electronics',   40, 10, 55.00,  109.99, 'a1b2c3d4-e5f6-7890-abcd-ef1234567890')
 ON CONFLICT (sku) DO NOTHING;
+
+-- ===========================================================================
+-- CUSTOMERS TABLE
+-- ===========================================================================
+
+CREATE TABLE IF NOT EXISTS customers (
+    id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    full_name  VARCHAR(255) NOT NULL,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    phone      VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
+
+CREATE TRIGGER trg_customers_updated_at
+    BEFORE UPDATE ON customers
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ===========================================================================
+-- ORDERS TABLE
+-- ===========================================================================
+
+CREATE TABLE IF NOT EXISTS orders (
+    id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_id  UUID NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+    status       customer_order_status NOT NULL DEFAULT 'PENDING',
+    total_amount NUMERIC(14, 2) NOT NULL DEFAULT 0.00,
+    notes        VARCHAR(500),
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer    ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status      ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at  ON orders(created_at DESC);
+
+CREATE TRIGGER trg_orders_updated_at
+    BEFORE UPDATE ON orders
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ===========================================================================
+-- ORDER ITEMS TABLE
+-- ===========================================================================
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id   UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+    quantity   INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price NUMERIC(12, 2) NOT NULL CHECK (unit_price >= 0),
+    subtotal   NUMERIC(14, 2) NOT NULL CHECK (subtotal >= 0)
+);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order   ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product ON order_items(product_id);
+
+-- ===========================================================================
+-- SAMPLE CUSTOMERS
+-- ===========================================================================
+
+INSERT INTO customers (full_name, email, phone) VALUES
+    ('Alice Thompson',  'alice.thompson@brighttech.com',   '+1-555-2101'),
+    ('Bob Martinez',    'bob.martinez@cloudventures.io',   '+1-555-2202'),
+    ('Carol Johnson',   'carol.j@greenleaf.org',           '+1-555-2303'),
+    ('David Chen',      'd.chen@nexusdynamic.com',         '+1-555-2404'),
+    ('Emma Williams',   'emma.w@prismsolutions.net',       '+1-555-2505'),
+    ('Frank Brown',     'frank.brown@alphalogistics.com',  '+1-555-2606'),
+    ('Grace Kim',       'grace.kim@stellardesign.co',      '+1-555-2707'),
+    ('Henry Davis',     'henry.d@apexconsulting.biz',      '+1-555-2808')
+ON CONFLICT (email) DO NOTHING;

@@ -77,4 +77,20 @@ export const analyticsAPI = {
   transactionHistory: () => api.get('/analytics/transaction-history'),
 }
 
+// ── Customers endpoints ───────────────────────────────────────────────────────
+export const customersAPI = {
+  list:   ()           => api.get('/customers'),
+  get:    (id)         => api.get(`/customers/${id}`),
+  create: (data)       => api.post('/customers', data),
+  delete: (id)         => api.delete(`/customers/${id}`),
+}
+
+// ── Orders endpoints ──────────────────────────────────────────────────────────
+export const ordersAPI = {
+  list:   ()     => api.get('/orders'),
+  get:    (id)   => api.get(`/orders/${id}`),
+  create: (data) => api.post('/orders', data),
+  delete: (id)   => api.delete(`/orders/${id}`),
+}
+
 export default api

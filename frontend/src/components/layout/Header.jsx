@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from 'react'
 const PAGE_TITLES = {
   '/dashboard':    { title: 'Dashboard',    subtitle: 'Overview & Analytics' },
   '/inventory':    { title: 'Inventory',    subtitle: 'Manage products & stock' },
+  '/customers':    { title: 'Customers',    subtitle: 'Customer directory' },
+  '/orders':       { title: 'Orders',       subtitle: 'Order management' },
   '/suppliers':    { title: 'Suppliers',    subtitle: 'Supplier directory' },
   '/transactions': { title: 'Transactions', subtitle: 'Stock movement history' },
 }

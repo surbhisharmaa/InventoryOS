@@ -45,7 +45,7 @@ export default function TransactionsPage() {
             <thead className="border-b border-white/8 bg-white/3">
               <tr>
                 <th className="table-header text-left">Type</th>
-                <th className="table-header text-left">Product ID</th>
+                <th className="table-header text-left">Product</th>
                 <th className="table-header text-right">Before</th>
                 <th className="table-header text-right">Changed</th>
                 <th className="table-header text-right">After</th>
@@ -76,9 +76,12 @@ export default function TransactionsPage() {
                           </span>
                         </td>
                         <td className="table-cell">
-                          <span className="font-mono text-xs text-white/50 truncate block max-w-[140px]">
-                            {tx.product_id}
-                          </span>
+                          <div>
+                            <p className="text-sm text-white/80 font-medium">{tx.product_name || 'Unknown Product'}</p>
+                            {tx.product_sku && (
+                              <p className="text-xs text-white/30 font-mono">{tx.product_sku}</p>
+                            )}
+                          </div>
                         </td>
                         <td className="table-cell text-right text-white/50">{tx.quantity_before}</td>
                         <td className="table-cell text-right font-semibold">

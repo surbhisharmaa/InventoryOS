@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { X, Loader2 } from 'lucide-react'
 import { productsAPI, suppliersAPI } from '../../services/api'
 import toast from 'react-hot-toast'
+import CustomSelect from '../ui/CustomSelect'
 
 const CATEGORIES = ['Electronics', 'Furniture', 'Stationery', 'Tools', 'Clothing', 'Food & Beverage', 'Other']
 
@@ -10,7 +11,7 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
   const [suppliers, setSuppliers] = useState([])
   const [submitting, setSubmitting] = useState(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
       name:          product.name,
       description:   product.description || '',
@@ -77,9 +78,14 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
 
           <div>
             <label className="label">Category *</label>
-            <select {...register('category', { required: true })} className="input-field">
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <input type="hidden" {...register('category', { required: 'Category is required' })} />
+            <CustomSelect
+              id="edit-product-category"
+              value={watch('category') || ''}
+              onChange={(e) => setValue('category', e.target.value, { shouldValidate: true })}
+              placeholder="Select category…"
+              options={CATEGORIES.map((c) => ({ value: c, label: c }))}
+            />
           </div>
 
           <div>
@@ -111,12 +117,16 @@ export default function EditProductModal({ product, onClose, onSuccess }) {
 
           <div>
             <label className="label">Supplier</label>
-            <select {...register('supplier_id')} className="input-field">
-              <option value="">No supplier</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
+            <CustomSelect
+              id="edit-product-supplier"
+              value={watch('supplier_id') || ''}
+              onChange={(e) => setValue('supplier_id', e.target.value)}
+              placeholder="No supplier"
+              options={[
+                { value: '', label: 'No supplier' },
+                ...suppliers.map((s) => ({ value: s.id, label: s.name })),
+              ]}
+            />
           </div>
 
           <p className="text-xs text-white/30">
