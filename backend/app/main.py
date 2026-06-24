@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import logging
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
@@ -60,9 +61,21 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
+# Read ALLOWED_ORIGINS env var, split by comma into a list
+_env_origins = os.getenv("ALLOWED_ORIGINS", "")
+_origins = [o.strip() for o in _env_origins.split(",") if o.strip()]
+
+# Fallback for local development if env var is not set
+if not _origins:
+    _origins = [
+        "https://inventory-os-puce.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
